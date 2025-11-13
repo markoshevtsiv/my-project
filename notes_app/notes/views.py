@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from .models import Note
 
-def hello_notes(request):
-    return HttpResponse("Hello from Notes app")
+def index(request):
+    notes = Note.objects.all()
+    return render(request, 'notes/index.html', {'notes': notes})
+

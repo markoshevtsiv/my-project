@@ -1,20 +1,17 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My notes</title>
-    <link rel="stylesheet" href="{% static 'notes/style.css' %}">
-</head>
-<body>
-    <h1>Notes</h1>
-    <div class="notes_container">
-        {% for note in notes %}
-            <div class="note">
-                <h2>{{ note.title }}</h2>
-                <p>{{ note.text }}</p>
-            </div>
-        {% endfor %}
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Your Notes</h2>
+<ul class="notes-list">
+    {% for note in notes %}
+        <li>
+            <h3>{{ note.title }}</h3>
+            <p><strong>Category:</strong> {{ note.category.title }}</p>
+            <p>{{ note.text }}</p>
+            <p><em>Reminder: {{ note.reminder|date:"d M Y H:i" }}</em></p>
+        </li>
+    {% empty %}
+        <li>No notes yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
