@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ author.first_name }} {{ author.last_name }}</title>
+    <style>
+        .book-list{
+            margin: 20px 0;
+        }
+        .book-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .availability {
+            color: green;
+        }
+        .unavailability {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>{{ author.first_name }} {{ author.last_name }}</h1>
+<div class="author-info">
+    <p><strong>Birthdate</strong> {{ author.birth_date }}</p>
+</div>
+<h2>AuthorBooks:</h2>
