@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 # Create your models here.
 
 class Category(models.Model):
@@ -13,6 +14,10 @@ class Note(models.Model):
     text = models.TextField()
     reminder = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='notes')
+
+    def get_absolute_url(self):
+        return reverse('author_detail', kwargs={'pk': self.pk})
+
 
     def __str__(self):
         return self.title

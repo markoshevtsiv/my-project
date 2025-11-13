@@ -1,14 +1,43 @@
-{% extends "base.html" %}
 
+{#{% extends "base.html" %}#}
+{##}
+{#{% block content %}#}
+{#<h2>Your Notes</h2>#}
+{#<ul class="notes-list">#}
+{#    {% for note in notes %}#}
+{#        <li>#}
+{#            <h3>{{ note.title }}</h3>#}
+{#            <p><strong>Category:</strong> {{ note.category.title }}</p>#}
+{#            <p>{{ note.text }}</p>#}
+{#            <p><em>Reminder: {{ note.reminder|date:"d M Y H:i" }}</em></p>#}
+{#        </li>#}
+{#    {% empty %}#}
+{#        <li>No notes yet.</li>#}
+{#    {% endfor %}#}
+{#</ul>#}
+{#{% endblock %}#}
+
+{% extends "base.html" %}
 {% block content %}
 <h2>Your Notes</h2>
+<form method="get" style="margin-bottom: 20px">
+    <input type="text" name="search" placeholder="Search by title" value="{{ request.GET.search }}">
+    <input type="text" name="category" placeholder="Search by category" value="{{ request.GET.category }}">
+    <input type="date" name="reminder", value="{{ request.GET.reminder }}">
+    <button type="submit">Search</button>
+    <a href="{% url 'index' %}">Clear</a>
+</form>
+<a href="{% url 'note_create' %}" class="btn">Create New Note</a>
+
 <ul class="notes-list">
     {% for note in notes %}
         <li>
-            <h3>{{ note.title }}</h3>
+            <h3><a href="{% url 'note_detail' note.pk %}">{{ note.title }}</a></h3>
             <p><strong>Category:</strong> {{ note.category.title }}</p>
             <p>{{ note.text }}</p>
-            <p><em>Reminder: {{ note.reminder|date:"d M Y H:i" }}</em></p>
+            <p><em>Reminder: {{ note.reminder|date:"d M Y" }}</em></p>
+            <a href="{% url 'note_edit' note.pk %}">Edit</a> |
+            <a href="{% url 'note_delete' note.pk %}">Delete</a>
         </li>
     {% empty %}
         <li>No notes yet.</li>
