@@ -1,0 +1,5 @@
+<form method="post">
+    {% csrf_token %}
+    <p>Ви впевнені, що хочите видалити {{ author }} </p>
+    <button type="submit">Так, видалити...</button>
+</form>

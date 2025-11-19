@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Бібліотека{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .book-details {
+            margin: 1.5rem 0;
+        }
+
+        .actions {
+            margin-top: 1rem;
+        }
+
+        .btn {
+            margin-right: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .messages {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+{# Навігаційне меню #}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container">
+
+    <!-- 1. БРЕНД ЗЛІВА -->
+    <a class="navbar-brand me-4" href="/">Бібліотека</a>
+
+    <!-- 2. КНОПКА ДЛЯ МАЛИХ ЕКРАНІВ -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 3. ВЕСЬ ВМІСТ МЕНЮ -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <!-- ЛІВА ЧАСТИНА МЕНЮ -->
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'book_create' %}">Додати книгу</a>
+        </li>
+      </ul>
+
+      <!-- 4. БРЕНД "НОТАТКИ" СПРАВА -->
+      <a class="navbar-brand me-4" href="{% url 'note_list' %}">Нотатки</a>
+
+      <!-- ПРАВА ЧАСТИНА МЕНЮ -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'note_create' %}">Створити нотатку</a>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+{# Повідомлення #}
+{% if messages %}
+    <div class="container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{# Основний контент #}
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+{# Footer #}
+<footer class="footer mt-auto bg-light">
+    <div class="container text-center">
+        <span class="text-muted">(c) {% now "Y" %} Бібліотека. Всі права захищені.</span>
+    </div>
+</footer>
+
+{# Bootstrap JS #}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+{% block extra_js %}
+{% endblock %}
+
+</body>
+</html>

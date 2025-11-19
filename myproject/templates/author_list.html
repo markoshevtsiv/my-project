@@ -1,0 +1,12 @@
+{% for author in authors %}
+
+<p>
+  <a href="{{author.get_absolute_url}}">{{ author.first_name }} {{ author.last_name }}</a>
+</p>
+{% endfor %}
+
+<form method="get">
+  <input type="number" name="age" placeholder="Фільтр за віком">
+  <input type="text" name="search" placeholder="Пошук за ім'ям">
+  <button type="submit">Шукати...</button>
+</form>

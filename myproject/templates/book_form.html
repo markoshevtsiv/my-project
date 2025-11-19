@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="mb-4">
+                    {% if form.instance.pk %}
+                        Редагування книги
+                    {% else %}
+                        Створення нової книги
+                    {% endif %}
+                </h2>
+                <div class="card">
+                    <div class="body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    <label class="form-label">{{ field.label }}</label>
+                                    {{ field.errors }}
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">Зберегти</button>
+                                <a href="{% url 'book_list' %}" class="btn btn-dark">Назад</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

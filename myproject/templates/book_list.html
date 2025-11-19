@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Список книг{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class='mb-4'>Список книг</h1>
+
+    <form method="get" class="mb-4">
+        <input type="text" name="search" class="form-control" placeholder="Пошук книги..." value="{{ request.GET.search }}">
+    </form>
+
+    <div class="row">
+        {% for book in books %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text"><strong>Автор:</strong> {{ book.author.first_name }} {{ book.author.last_name }}</p>
+                    <a href="{% url 'book_detail' book.pk %}" class="btn btn-primary btn-sm">Деталі</a>
+                    <a href="{% url 'book_update' book.pk %}" class="btn btn-warning btn-sm">Редагувати</a>
+                    <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger btn-sm">Видалити</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Книг немає.</p>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-3">
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Попередня</a>
+        {% endif %}
+        <span class="mx-2">Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Наступна</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

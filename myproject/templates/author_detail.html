@@ -1,0 +1,3 @@
+<p>{{ author.first_name}} {{ author.last_name }} ({{ author.birth_date}})</p>
+<a href="{% url 'author_edit' author.pk %}">Редагувати</a>
+<a href="{% url 'author_delete' author.pk %}">Видалити</a>
