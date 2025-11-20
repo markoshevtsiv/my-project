@@ -30,16 +30,29 @@
             </button>
 
             <!-- Меню -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{% url 'note_create' %}">Create notes</a>
-                    </li>
-                </ul>
-            </div>
+{#            <div class="collapse navbar-collapse" id="navbarNav">#}
+{#                <ul class="navbar-nav ms-4>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" aria-current="page" href="{% url 'note_create' %}">Create note</a>#}
+{#                    </li>#}
+{#                </ul>#}
+<ul class="navbar-nav ms-auto">
+    {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+        <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link nav-link">Logout</button>
+            </form>
+        </li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+    {% endif %}
+</ul>
+
         </div>
     </nav>
 </header>
@@ -53,7 +66,11 @@
 
     <footer class="bg-dark text-white py-3 mt-auto">
         <div class="container text-center">
+<<<<<<< HEAD
             <p class="m-0"> 2025 My Notes</p>
+=======
+            <p class="m-0">2025 My Notes</p>
+>>>>>>> d11f0f9 (HM 43)
         </div>
     </footer>
 

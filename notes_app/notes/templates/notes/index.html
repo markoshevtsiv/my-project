@@ -64,6 +64,8 @@
                     <em>{{ note.reminder|date:"d M Y" }}</em>
                 </p>
 
+                <p><strong>Created by: </strong>{{ note.user.username }}</p>
+
                 <a href="{% url 'note_edit' note.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <a href="{% url 'note_delete' note.pk %}" class="btn btn-danger btn-sm">Delete</a>
 
@@ -76,9 +78,3 @@
 </div>
 
 {% endblock %}
-
-
-
-
-
-

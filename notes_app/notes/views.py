@@ -1,66 +1,79 @@
 from django.shortcuts import render
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.db.models import Q
 from .forms import NoteForm
 from .models import Note, Category
 
-
 def index(request):
-    notes = Note.objects.all()
-    return render(request, 'notes/index.html', {'notes': notes})
+    return render(request, 'notes/index.html')
 
 
-class NoteListView(ListView):
+class NoteListView(LoginRequiredMixin, ListView):
     model = Note
     template_name = "notes/index.html"
     context_object_name = "notes"
-    is_paginated = 1
+    login_url = '/login/'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        user = self.request.user
+        view_type = self.request.GET.get("view", "personal")  # "personal" або "group"
 
-        # Назви ПОВНІСТЮ відповідають формі
-        search = self.request.GET.get('search')
-        category = self.request.GET.get('category')
-        reminder = self.request.GET.get('reminder')
+        queryset = Note.objects.filter(user=user)  # персональні нотатки
 
-        # Пошук за назвою
-        if search and search.strip():
-            queryset = queryset.filter(title__icontains=search.strip())
+        if view_type == "group":
+            # нотатки груп, де користувач є учасником
+            queryset = Note.objects.filter(group__in=user.groups.all())
 
-        # Пошук за категорією
-        if category and category.strip():
-            queryset = queryset.filter(category__title__icontains=category.strip())
+        search = self.request.GET.get("search", "")
+        category = self.request.GET.get("category", "")
+        reminder = self.request.GET.get("reminder", "")
 
-        # Пошук за датою нагадування
+        if search:
+            queryset = queryset.filter(Q(title__icontains=search) | Q(text__icontains=search))
+        if category:
+            queryset = queryset.filter(category__title__icontains=category)
         if reminder:
-            queryset = queryset.filter(reminder=reminder)
+            queryset = queryset.filter(reminder__date=reminder)
 
         return queryset
 
 
-class NoteCreateView(CreateView):
+
+class NoteCreateView(LoginRequiredMixin, CreateView):
     model = Note
     form_class = NoteForm
     template_name = 'notes/note_create.html'
     success_url = reverse_lazy('index')
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-class NoteDetailView(DetailView):
+
+class NoteDetailView(LoginRequiredMixin, DetailView):
     model = Note
-    form_class = NoteForm
     template_name = 'notes/note_detail.html'
 
+    def get_queryset(self):
+        return Note.objects.filter(user=self.request.user)
 
-class NoteUpdateView(UpdateView):
+
+class NoteUpdateView(LoginRequiredMixin, UpdateView):
     model = Note
     form_class = NoteForm
     template_name = 'notes/note_edit.html'
     success_url = reverse_lazy('index')
 
+    def get_queryset(self):
+        return Note.objects.filter(user=self.request.user)
 
-class NoteDeleteView(DeleteView):
+
+class NoteDeleteView(LoginRequiredMixin, DeleteView):
     model = Note
-    form_class = NoteForm
     template_name = "notes/note_delete.html"
     success_url = reverse_lazy('index')
+
+    def get_queryset(self):
+        return Note.objects.filter(user=self.request.user)
