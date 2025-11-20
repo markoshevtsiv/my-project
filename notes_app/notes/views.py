@@ -9,25 +9,35 @@ def index(request):
     notes = Note.objects.all()
     return render(request, 'notes/index.html', {'notes': notes})
 
+
 class NoteListView(ListView):
     model = Note
     template_name = "notes/index.html"
     context_object_name = "notes"
+    is_paginated = 1
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        # Назви ПОВНІСТЮ відповідають формі
+        search = self.request.GET.get('search')
         category = self.request.GET.get('category')
-        search_title = self.request.GET.get('search_title')
         reminder = self.request.GET.get('reminder')
 
-        if category:
-            queryset = queryset.filter(category__title__icontains=category)
-        if search_title:
-            queryset = queryset.filter(title__icontains=search_title)
+        # Пошук за назвою
+        if search and search.strip():
+            queryset = queryset.filter(title__icontains=search.strip())
+
+        # Пошук за категорією
+        if category and category.strip():
+            queryset = queryset.filter(category__title__icontains=category.strip())
+
+        # Пошук за датою нагадування
         if reminder:
-            queryset = queryset.filter(reminder__date=reminder)
+            queryset = queryset.filter(reminder=reminder)
 
         return queryset
+
 
 class NoteCreateView(CreateView):
     model = Note
@@ -35,16 +45,19 @@ class NoteCreateView(CreateView):
     template_name = 'notes/note_create.html'
     success_url = reverse_lazy('index')
 
+
 class NoteDetailView(DetailView):
     model = Note
     form_class = NoteForm
     template_name = 'notes/note_detail.html'
+
 
 class NoteUpdateView(UpdateView):
     model = Note
     form_class = NoteForm
     template_name = 'notes/note_edit.html'
     success_url = reverse_lazy('index')
+
 
 class NoteDeleteView(DeleteView):
     model = Note
