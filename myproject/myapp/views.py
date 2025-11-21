@@ -1,10 +1,13 @@
-
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 from .models import Book, Author, Notes
-from .forms import AuthorForm, BookForm, NotesForm
+from .forms import AuthorForm, BookForm, NotesForm, LoginForm, RegisterForm
 from django.utils.timezone import now
 from datetime import timedelta
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 class AuthorCreateView(CreateView):
@@ -52,7 +55,7 @@ class AuthorListView(ListView):
         return queryset
 
 
-class BookCreateView(CreateView):
+class BookCreateView(LoginRequiredMixin, CreateView):
     """
     Клас для створення нової книги.
     Використовує стандартний клас Django CreateView.
@@ -61,6 +64,10 @@ class BookCreateView(CreateView):
     form_class = BookForm  # Вказуємо форму, яка використовується для введення даних
     template_name = 'book_form.html'  # Шаблон для відображення форми
     success_url = reverse_lazy('book_list')  # Перенаправлення після успішного створення книги
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class BookDetailView(DetailView):
@@ -72,8 +79,16 @@ class BookDetailView(DetailView):
     template_name = 'book_detail.html'  # Шаблон для відображення деталей книги
     context_object_name = 'book'  # Ім'я змінної, яка передається в шаблон (за замовчуванням 'object')
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_authenticated:
+            return queryset.filter(user__isnull=True)
+        user_group = self.request.user.book_groups.all()
+        # group_books = Book.objects.filter(book_groups__in=user_group)
+        return queryset.filter(user=self.request.user) | queryset.filter(user__isnull=True)
 
-class BookUpdateView(UpdateView):
+
+class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin,UpdateView):
     """
     Редагування книги.
     Використовує стандартний клас Django UpdateView.
@@ -89,8 +104,12 @@ class BookUpdateView(UpdateView):
         """
         return reverse_lazy('book_detail', kwargs={'pk': self.object.pk})
 
+    def test_func(self):
+        book = self.get_object()
+        return self.request.user == book.user
 
-class BookDeleteView(DeleteView):
+
+class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     Видалення книги.
     Використовує стандартний клас Django DeleteView.
@@ -98,6 +117,10 @@ class BookDeleteView(DeleteView):
     model = Book  # Вказуємо модель
     success_url = reverse_lazy('book_list')  # Перенаправлення після видалення книги
     template_name = 'book_confirm_delete.html'  # Шаблон для підтвердження видалення
+
+    def test_func(self):
+        book = self.get_object()
+        return self.request.user == book.user
 
 
 class BookListView(ListView):
@@ -158,6 +181,52 @@ class NoteListView(ListView):
         if search_query:
             queryset = queryset.filter(title__icontains=search_query)
         return queryset
+
+
+def login_view(request):
+    if request.method == 'GET':
+        form = LoginForm()
+        return render(request, 'login.html', {'form': form} )
+    elif request.method == 'POST':
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Вітаємо, {username}")
+                return redirect('book_list')
+            else:
+                messages.error(request, f"Неправильне ім'я користувача або пароль")
+
+        return render(request, 'login.html', {'form': form})
+
+def register_view(request):
+    if request.method == 'GET':
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form} )
+    elif request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Реєстрація успішна')
+
+            return redirect('book_list')
+        return render(request, 'register.html', {'form': form})
+
+
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Ви успішно вийшли із системи')
+    return redirect('login')
+
+
+
+
 
 
 

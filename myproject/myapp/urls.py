@@ -1,6 +1,8 @@
+from django.contrib.auth.views import LoginView
 from django.urls import path
 # from .views import AuthorCreateView, AuthorDetailView, AuthorUpdateView, AuthorDeleteView, AuthorListView
-from .views import BookListView, BookCreateView, BookDetailView, BookUpdateView, BookDeleteView,  NoteListView, NoteDetailView, NoteCreateView, NoteUpdateView, NoteDeleteView
+from .views import BookListView, BookCreateView, BookDetailView, BookUpdateView, BookDeleteView, NoteListView, \
+    NoteDetailView, NoteCreateView, NoteUpdateView, NoteDeleteView, login_view, register_view, logout_view
 
 # urlpatterns = [
 #      path('', AuthorListView.as_view(), name='author_list'),
@@ -21,5 +23,9 @@ urlpatterns = [
    path('notes/create/', NoteCreateView.as_view(), name='note_create'),
    path('notes/<int:pk>/update/', NoteUpdateView.as_view(), name='note_update'),
    path('notes/<int:pk>/delete/', NoteDeleteView.as_view(), name='note_delete'),
+   path('login/', login_view, name='login'),
+   path('register/', register_view, name='register'),
+   path('logout/', logout_view, name='logout'),
+
 
 ]

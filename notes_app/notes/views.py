@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.db.models import Q
-from .forms import NoteForm
-from .models import Note, Category
+from .forms import NoteForm, LoginForm, RegisterForm
+from .models import Note
 
 def index(request):
     return render(request, 'notes/index.html')
@@ -77,3 +79,44 @@ class NoteDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Note.objects.filter(user=self.request.user)
+
+
+def login_view(request):
+    if request.method == "GET":
+        form = LoginForm()
+        return render(request, "login.html", {"form": form})
+    elif request.method == "POST":
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                messages.success(request, f'Welcome, {user}!')
+                return redirect('index')
+            else:
+                messages.error(request, f'Invalid username or password')
+
+        return render(request, "login.html", {"form": form})
+
+def register_view(request):
+    if request.method == 'GET':
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form} )
+    elif request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Registration successful!')
+
+            return redirect('index')
+        return render(request, 'register.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You successfully logged out.")
+    return redirect("login")
